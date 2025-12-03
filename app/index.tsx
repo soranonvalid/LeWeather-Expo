@@ -1,3 +1,4 @@
+import { Mainstyles as styles } from "@/lib/style";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -93,54 +94,3 @@ const Index = () => {
 };
 
 export default Index;
-
-const styles = StyleSheet.create({
-  Container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#708ADF",
-  },
-
-  Header: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 8,
-    marginBottom: 16,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    paddingHorizontal: 12,
-  },
-
-  Main: {
-    flex: 1, // buat berada di tengah
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    backgroundColor: "yellow",
-    borderRadius: 16,
-    padding: 20,
-  },
-
-  UnderMain: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
-    padding: 16,
-    borderRadius: 16,
-    marginTop: 16,
-  },
-
-  Card: {
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-
-  TextMain: {
-    fontSize: 48,
-    fontWeight: "bold",
-  },
-});
