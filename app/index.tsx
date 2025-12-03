@@ -61,44 +61,42 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+  Container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#708ADF",
+  },
+
   Header: {
     width: "100%",
     flexDirection: "row",
-    gap: 16,
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 32,
+    paddingVertical: 8,
+    marginBottom: 16,
     backgroundColor: "#FFFFFF",
-  },
-
-  Container: {
-    flex: 1,
-    display: "flex",
-    alignItems: "center",
-    paddingVertical: 30,
-    paddingHorizontal: 15,
-    height: "100%",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    backgroundColor: "#708ADF",
-    gap: 8,
+    borderRadius: 12,
+    paddingHorizontal: 12,
   },
 
   Main: {
+    flex: 1, // buat berada di tengah
     alignItems: "center",
-    display: "flex",
-    gap: 8,
     justifyContent: "center",
+    gap: 8,
     backgroundColor: "yellow",
-    marginVertical: "auto",
+    borderRadius: 16,
+    padding: 20,
   },
 
   UnderMain: {
     width: "100%",
     flexDirection: "row",
-    marginTop: "100%",
     justifyContent: "space-between",
     backgroundColor: "#FFFFFF",
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 16,
   },
 
   Card: {
