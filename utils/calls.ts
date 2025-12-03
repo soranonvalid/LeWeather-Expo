@@ -70,6 +70,7 @@ export async function getWeather(lon: number = 0, lat: number = 0) {
 
 export async function getCities(q: string) {
   const key = process.env.EXPO_PUBLIC_GEO;
+  console.log(key);
   if (!q || q.trim() === "" || q.length < 3) return;
   try {
     const res = await axios.get(
