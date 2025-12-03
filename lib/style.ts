@@ -66,7 +66,7 @@ export const Mainstyles = StyleSheet.create({
     gap: 8,
     backgroundColor: "yellow",
     borderRadius: 16,
-    padding: 20,
+    padding: 16,
   },
 
   UnderMain: {
@@ -86,7 +86,14 @@ export const Mainstyles = StyleSheet.create({
   },
 
   TextMain: {
-    fontSize: 48,
-    fontWeight: "bold",
+    fontSize: 60,
+    maxWidth: "90%",
+    textAlign: "center",
+  },
+
+  TextUnderMain: {
+    fontSize: 26,
+    maxWidth: "90%",
+    textAlign: "center",
   },
 });

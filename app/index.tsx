@@ -1,4 +1,5 @@
-import { Mainstyles as styles } from "@/lib/style";
+import { fontFamily, Mainstyles as styles } from "@/lib/style";
+import { LoadFont } from "@/utils/calls";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -7,12 +8,12 @@ import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Index = () => {
+  LoadFont();
   const route = useRouter();
   const { lon, lat } = useLocalSearchParams();
   const [pos, setPos] = useState({ lat: 0, lon: 0 });
   const [isFetch, setIsFetch] = useState<boolean>(false);
 
-  // getting position
   useEffect(() => {
     const getPosition = async () => {
       setIsFetch(true);
@@ -63,10 +64,22 @@ const Index = () => {
       </View>
 
       <View style={styles.Main}>
-        <MaterialCommunityIcons name="weather-rainy" size={100} />
-        <Text style={styles.TextMain}>28°</Text>
-        <Text style={styles.TextMain}>Rainy</Text>
-        <Text>
+        <MaterialCommunityIcons name="weather-rainy" size={150} />
+        <Text
+          style={[fontFamily.bold, styles.TextMain]}
+          adjustsFontSizeToFit
+          numberOfLines={1}
+        >
+          28°
+        </Text>
+        <Text
+          style={[fontFamily.semiBold, styles.TextUnderMain]}
+          adjustsFontSizeToFit
+          numberOfLines={1}
+        >
+          Rainy
+        </Text>
+        <Text style={{ fontSize: 14, textAlign: "center" }}>
           Intensitas hujan yang mungkin terjadi diperkirakan ringan hingga
           sedang.
         </Text>
