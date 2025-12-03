@@ -1,4 +1,5 @@
 import { Mainstyles as styles } from "@/lib/style";
+import { LoadFont } from "@/utils/calls";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -7,12 +8,15 @@ import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Index = () => {
+  LoadFont();
   const route = useRouter();
   const { lon, lat } = useLocalSearchParams();
   const [pos, setPos] = useState({ lat: 0, lon: 0 });
   const [isFetch, setIsFetch] = useState<boolean>(false);
 
-  // getting position
+  const [bg, setBg] = useState<string>("");
+  const [cl, setCl] = useState<string>("");
+
   useEffect(() => {
     const getPosition = async () => {
       setIsFetch(true);
@@ -34,7 +38,6 @@ const Index = () => {
         const loc = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Highest,
         });
-        console.log("fetching position...");
         const { latitude, longitude } = loc.coords;
         setPos({
           lat: latitude,
@@ -52,7 +55,13 @@ const Index = () => {
   return (
     <SafeAreaView style={styles.Container}>
       <View style={styles.Header}>
-        <MaterialCommunityIcons name="map-search" size={24} />
+        <MaterialCommunityIcons
+          onPress={() => {
+            route.push("/search");
+          }}
+          name="map-search"
+          size={24}
+        />
 
         <View>
           <Text>Cileungsi</Text>
@@ -65,7 +74,7 @@ const Index = () => {
       <View style={styles.Main}>
         <MaterialCommunityIcons name="weather-rainy" size={100} />
         <Text style={styles.TextMain}>28°</Text>
-        <Text style={styles.TextMain}>Rainy</Text>
+        <Text style={[styles.TextMain]}>Rainy</Text>
         <Text>
           Intensitas hujan yang mungkin terjadi diperkirakan ringan hingga
           sedang.
@@ -74,17 +83,17 @@ const Index = () => {
 
       <View style={styles.UnderMain}>
         <View style={styles.Card}>
-          <MaterialCommunityIcons name="cloud" />
+          <MaterialCommunityIcons size={24} name="cloud" />
           <Text>45%</Text>
           <Text>Clouds</Text>
         </View>
         <View style={styles.Card}>
-          <MaterialCommunityIcons name="water-percent" />
+          <MaterialCommunityIcons size={24} name="water-percent" />
           <Text>45%</Text>
           <Text>Humidity</Text>
         </View>
         <View style={styles.Card}>
-          <MaterialCommunityIcons name="weather-windy" />
+          <MaterialCommunityIcons size={24} name="weather-windy" />
           <Text>45%</Text>
           <Text>Wind</Text>
         </View>

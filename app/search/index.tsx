@@ -38,12 +38,28 @@ export default function Index() {
         },
       ]}
     >
-      <View style={[styleSearch.base]}>
-        <MaterialIcons name="search" size={18} />
-        <TextInput
-          onChangeText={handleChange}
-          style={{ fontSize: 16 }}
-          placeholder="Search"
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <View style={[styleSearch.base]}>
+          <MaterialIcons name="search" size={18} />
+          <TextInput
+            onChangeText={handleChange}
+            style={{ fontSize: 16 }}
+            placeholder="Search"
+          />
+        </View>
+        <MaterialIcons
+          onPress={() => {
+            route.back();
+          }}
+          name="cancel"
+          size={24}
         />
       </View>
       <View style={{ paddingTop: 20 }}>
