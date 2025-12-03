@@ -1,5 +1,5 @@
 import axios from "axios";
-// font needs
+
 import { Roboto_100Thin } from "@expo-google-fonts/roboto/100Thin";
 import { Roboto_100Thin_Italic } from "@expo-google-fonts/roboto/100Thin_Italic";
 import { Roboto_200ExtraLight } from "@expo-google-fonts/roboto/200ExtraLight";
