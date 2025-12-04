@@ -1,6 +1,6 @@
-import { fontFamily, styles, styleSearch } from "@/lib/style";
-import { getCities, LoadFont, location } from "@/utils/calls";
-import { MaterialIcons } from "@expo/vector-icons";
+import { fontFamily, Settingstyles, styles, styleSearch } from "@/lib/style";
+import { getCities, location } from "@/utils/calls";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -14,12 +14,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const [search, setSearch] = useState<string>("");
+  const [inp, setInp] = useState<string>("");
   const [list, setList] = useState<any>();
   const route = useRouter();
   const debounceRef = useRef<number>(null);
-  LoadFont();
+  const inputRef = useRef<TextInput>(null);
+  const [isFetch, setIsFetch] = useState<boolean>(false);
 
   const handleChange = (text: string) => {
+    setInp(text);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       setSearch(text);
@@ -44,6 +47,7 @@ export default function Index() {
           flexDirection: "row",
           alignItems: "center",
           gap: 10,
+          opacity: isFetch ? 0.3 : 1,
         }}
       >
         <View style={[styleSearch.base]}>
@@ -52,13 +56,21 @@ export default function Index() {
             onChangeText={handleChange}
             style={{ fontSize: 16 }}
             placeholder="Search"
+            ref={inputRef}
           />
         </View>
         <MaterialIcons
           onPress={() => {
-            route.back();
+            inputRef.current?.clear();
           }}
           name="close"
+          size={24}
+        />
+        <MaterialIcons
+          onPress={() => {
+            route.push("/");
+          }}
+          name="location-searching"
           size={24}
         />
       </View>
@@ -70,6 +82,7 @@ export default function Index() {
             if (item.city && item.city.trim() !== "") {
               return (
                 <TouchableOpacity
+                  disabled={isFetch}
                   onPress={() => {
                     route.push({
                       pathname: "/",
@@ -87,8 +100,49 @@ export default function Index() {
             }
             return null;
           }}
+          ListEmptyComponent={
+            <View
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: 500,
+                gap: 10,
+                opacity: 0.5,
+              }}
+            >
+              <MaterialCommunityIcons name="clouds" size={110} />
+              <Text>Start typing to search location.</Text>
+            </View>
+          }
         />
       </View>
+      <TouchableOpacity
+        disabled={isFetch}
+        onPress={() => {
+          if (inp.trim() === "") {
+            route.back();
+            return;
+          }
+          setIsFetch(true);
+          getCities(inp)
+            .then((res) => {
+              route.push({
+                pathname: "/",
+                params: { lon: res[0].lon, lat: res[0].lat, loc: res[0].city },
+              });
+            })
+            .finally(() => setIsFetch(false));
+        }}
+        style={Settingstyles.return}
+      >
+        <MaterialCommunityIcons
+          name="keyboard-backspace"
+          size={30}
+          color="white"
+        />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }

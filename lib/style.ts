@@ -71,6 +71,7 @@ export const Mainstyles = StyleSheet.create({
   UnderMain: {
     width: "100%",
     flexDirection: "row",
+    paddingVertical: 8,
     justifyContent: "space-between",
     padding: 16,
     borderRadius: 16,
@@ -94,5 +95,82 @@ export const Mainstyles = StyleSheet.create({
   TextUnderMain: {
     fontSize: 60,
     textAlign: "center",
+  },
+});
+
+export const Settingstyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 8,
+    backgroundColor: "#fff",
+  },
+
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+
+  section: {
+    marginTop: 20,
+  },
+
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+
+  card: {
+    justifyContent: "center",
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 10,
+  },
+
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  label: {
+    fontSize: 16,
+  },
+
+  picker: {
+    height: 40,
+    width: 120,
+  },
+
+  divider: {
+    marginVertical: 20,
+    height: 1,
+    backgroundColor: "#ccc",
+    width: "100%",
+  },
+
+  aboutText: {
+    fontSize: 15,
+    marginTop: 6,
+    color: "#333",
+  },
+  return: {
+    backgroundColor: "black",
+    width: 60,
+    height: 60,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "100%",
+    position: "absolute",
+    bottom: 30,
+    right: 30,
   },
 });

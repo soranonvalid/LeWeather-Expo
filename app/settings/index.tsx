@@ -1,14 +1,19 @@
-import { View, Text, StyleSheet } from "react-native";
-
+import { Settingstyles as styles } from "@/lib/style";
+import { SettingsContext } from "@/utils/context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
+import { useRouter } from "expo-router";
+import { useContext } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Settings() {
+  const { setTunits, setWunits, tunits, wunits } = useContext(SettingsContext);
+  const route = useRouter();
   return (
-    <View style={styles.container}>
-      {/* Title */}
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Settings</Text>
 
-      {/* Units */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <MaterialCommunityIcons name="thermometer" size={28} />
@@ -19,10 +24,27 @@ export default function Settings() {
         <View style={styles.card}>
           <View style={styles.row}>
             <Text style={styles.label}>Temperature</Text>
+            <Picker
+              onValueChange={(v) => setTunits(Number(v))}
+              style={{ width: 200 }}
+              selectedValue={String(tunits)}
+            >
+              <Picker.Item label="Celsius" value="0" />
+              <Picker.Item label="Fahrenheit" value="1" />
+            </Picker>
           </View>
 
           <View style={styles.row}>
             <Text style={styles.label}>Wind Speed</Text>
+            <Picker
+              onValueChange={(v) => setWunits(Number(v))}
+              selectedValue={String(wunits)}
+              style={{ width: 200 }}
+            >
+              <Picker.Item label="km/h" value="0" />
+              <Picker.Item label="m/s" value="1" />
+              <Picker.Item label="mph" value="2" />
+            </Picker>
           </View>
         </View>
       </View>
@@ -36,78 +58,22 @@ export default function Settings() {
           <Text style={styles.sectionTitle}>About App</Text>
         </View>
 
-        <Text style={styles.aboutText}>Leweather - Built with love.</Text>
+        <Text style={styles.aboutText}>Leweather - Built with pawangers.</Text>
         <Text style={styles.aboutText}>V.0.0.1</Text>
         <Text style={styles.aboutText}>KODEIN STUDENTS. XI GRADE</Text>
       </View>
-    </View>
+      <TouchableOpacity
+        onPress={() => {
+          route.back();
+        }}
+        style={styles.return}
+      >
+        <MaterialCommunityIcons
+          name="keyboard-backspace"
+          size={30}
+          color="white"
+        />
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 }
-
-export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 10,
-  },
-
-  section: {
-    marginTop: 20,
-  },
-
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-
-  card: {
-    justifyContent: "center",
-    marginTop: 12,
-    padding: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#cccccc",
-  },
-
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-
-  label: {
-    fontSize: 16,
-  },
-
-  picker: {
-    height: 40,
-    width: 120,
-  },
-
-  divider: {
-    marginVertical: 20,
-    height: 1,
-    backgroundColor: "#ccc",
-    width: "100%",
-  },
-
-  aboutText: {
-    fontSize: 15,
-    marginTop: 6,
-    color: "#333",
-  },
-});

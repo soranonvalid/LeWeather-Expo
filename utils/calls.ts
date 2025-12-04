@@ -39,9 +39,20 @@ export interface location {
   code: string;
 }
 
+export function getTemp(w: number) {
+  if (w === 0) return "C";
+  return "F";
+}
+
+export function getWind(w: number) {
+  if (w === 0) return "km/h";
+  if (w === 1) return "m/s";
+  return "mph";
+}
+
 export async function GetResponse(data: weather, loc: string) {
   if (!data) return;
-  console.log("start process");
+  console.log("Responding...");
   const key = process.env.EXPO_PUBLIC_AI;
   const body = {
     model: "google/gemma-3-27b-it:free",
@@ -71,9 +82,10 @@ export async function GetResponse(data: weather, loc: string) {
         },
       }
     );
+    console.log(res);
     return res?.data?.choices[0]?.message?.content;
   } catch (error) {
-    console.error(error);
+    console.error("res", error);
     return "";
   }
 }
@@ -89,7 +101,7 @@ export async function getWeather(lat: number = 0, lon: number = 0) {
       if (id >= 801 && id <= 802) return "Cloudy";
       if (id >= 803 && id <= 804) return "Overcast";
       if (id >= 500 && id <= 531) return "Rainy";
-      if (id >= 200 && id <= 232) return "Thunderstorm";
+      if (id >= 200 && id <= 232) return "Storm";
       if (id >= 300 && id <= 321) return "Drizzle";
       if (id >= 600 && id <= 622) return "Snow";
       if (id >= 701 && id <= 781) return "Fog";
@@ -106,7 +118,7 @@ export async function getWeather(lat: number = 0, lon: number = 0) {
       loc: res.data.name || res.data.sys.country,
     };
   } catch (err) {
-    console.error(err);
+    console.error("weather", err);
   }
 }
 
@@ -132,12 +144,12 @@ export async function getCities(q: string) {
     console.log(list);
     return list;
   } catch (err) {
-    console.error(err);
+    console.error("city", err);
   }
 }
 
-export const LoadFont = () => {
-  let [fontsLoaded] = useFonts({
+export const useLoadFont = () => {
+  const [fontsLoaded] = useFonts({
     Roboto_100Thin,
     Roboto_200ExtraLight,
     Roboto_300Light,
@@ -157,5 +169,6 @@ export const LoadFont = () => {
     Roboto_800ExtraBold_Italic,
     Roboto_900Black_Italic,
   });
+
   return fontsLoaded;
 };

@@ -1,17 +1,19 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { fontFamily, Mainstyles as styles } from "@/lib/style";
 import WeatherIco from "@/lib/weatherIco";
-import { GetResponse, getWeather, LoadFont, weather } from "@/utils/calls";
+import { GetResponse, getWeather, getWind, weather } from "@/utils/calls";
+import { SettingsContext } from "@/utils/context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Index = () => {
-  LoadFont();
   const route = useRouter();
   const { lon, lat, loc } = useLocalSearchParams();
+  const { tunits, wunits } = useContext(SettingsContext);
 
   // str
   const [com, setCom] = useState<string>("");
@@ -26,9 +28,6 @@ const Index = () => {
   // tone
   const [bg, setBg] = useState<string>("#131313");
   const [cl, setCl] = useState<string>("#ffffff");
-
-  const wUnits = 0;
-  const tunits = 0;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -128,6 +127,26 @@ const Index = () => {
     };
     fetch();
   }, [lon, lat, loc, bg]);
+
+  function convTemp(p: number, c: number = 1) {
+    if (p === 0) return Number(c.toFixed(1));
+    const f = (c * 9) / 5 + 32;
+    return Number(f.toFixed(1));
+  }
+
+  function convWind(p: number, w: number = 1) {
+    if (p === 0) return w;
+    if (p === 1) {
+      const kms = w / 3.6;
+      return Number(kms.toFixed(2));
+    }
+    const mph = w / 1.609;
+    return Number(mph.toFixed(2));
+  }
+
+  const displayTemp = pckg ? convTemp(tunits, pckg.temp) : "--";
+  const displayWind = pckg ? convWind(wunits, pckg.wind) : "--";
+
   return (
     <SafeAreaView style={[styles.Container, { backgroundColor: bg }]}>
       <View style={styles.Header}>
@@ -156,7 +175,14 @@ const Index = () => {
           </Text>
         </View>
 
-        <MaterialCommunityIcons color={cl} name="menu" size={24} />
+        <MaterialCommunityIcons
+          onPress={() => {
+            route.push("/settings");
+          }}
+          color={cl}
+          name="menu"
+          size={24}
+        />
       </View>
 
       <View style={styles.Main}>
@@ -167,7 +193,7 @@ const Index = () => {
             adjustsFontSizeToFit
             numberOfLines={1}
           >
-            {isFetch ? "--" : pckg?.temp}
+            {isFetch ? "--" : displayTemp}
           </Text>
           <Text
             style={[fontFamily.regular, styles.TextIndicator, { color: cl }]}
@@ -182,7 +208,7 @@ const Index = () => {
           {isFetch ? "" : pckg?.weather}
         </Text>
         <Text style={{ fontSize: 14, textAlign: "center", color: cl }}>
-          {!isFetch && !isRes ? "" : com}
+          {!isFetch && !res ? com : ""}
         </Text>
       </View>
 
@@ -200,8 +226,8 @@ const Index = () => {
         <View style={styles.Card}>
           <MaterialCommunityIcons size={24} color={cl} name="weather-windy" />
           <Text style={{ color: cl }}>
-            {isFetch ? "--" : pckg?.wind}
-            {wUnits}
+            {isFetch ? "--" : displayWind}
+            {getWind(wunits)}
           </Text>
           <Text style={{ color: cl }}>Wind</Text>
         </View>
