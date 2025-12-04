@@ -1,5 +1,6 @@
 import { fontFamily, Mainstyles as styles } from "@/lib/style";
-import { LoadFont } from "@/utils/calls";
+import WeatherIco from "@/lib/weatherIco";
+import { GetResponse, getWeather, LoadFont, weather } from "@/utils/calls";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -10,52 +11,128 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const Index = () => {
   LoadFont();
   const route = useRouter();
-  const { lon, lat } = useLocalSearchParams();
-  const [pos, setPos] = useState({ lat: 0, lon: 0 });
-  const [isFetch, setIsFetch] = useState<boolean>(false);
+  const { lon, lat, loc } = useLocalSearchParams();
 
-  const [bg, setBg] = useState<string>("");
-  const [cl, setCl] = useState<string>("");
+  // str
+  const [com, setCom] = useState<string>("");
+  const [city, setCity] = useState<string>("");
+  const [tm, setTm] = useState<Date | undefined>();
+  const [pckg, setPckg] = useState<weather | null>(null);
+
+  // params
+  const [isFetch, setIsFetch] = useState<boolean>(false);
+  const [res, isRes] = useState<boolean>(false);
+
+  // tone
+  const [bg, setBg] = useState<string>("#131313");
+  const [cl, setCl] = useState<string>("#ffffff");
+
+  const wUnits = 0;
+  const tunits = 0;
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTm(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const getPosition = async () => {
-      setIsFetch(true);
       if (lon && lat) {
         console.log("local base");
-        setPos({
+        return {
           lon: parseFloat(lon as string),
           lat: parseFloat(lat as string),
-        });
-        setIsFetch(false);
-        return;
+        };
       }
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        setPos({ lat: 51.5072, lon: 0.1276 });
-        return;
+        return { lat: 51.5072, lon: 0.1276 };
       }
       try {
         const loc = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Highest,
         });
         const { latitude, longitude } = loc.coords;
-        setPos({
+        return {
           lat: latitude,
           lon: longitude,
-        });
+        };
       } catch (err) {
         console.log(err, Location.PermissionStatus);
-        setPos({ lat: 51.5072, lon: 0.1276 });
-      } finally {
-        setIsFetch(false);
+        return { lat: 51.5072, lon: 0.1276 };
       }
     };
-    getPosition();
-  }, [lon, lat]);
+
+    const fetchRes = () => {
+      isRes(true);
+      if (pckg)
+        GetResponse(pckg, city)
+          .then((res) => {
+            setCom(res);
+          })
+          .catch((err) => {
+            setCom("");
+          })
+          .finally(() => {
+            isRes(false);
+          });
+    };
+
+    const fetch = async () => {
+      setIsFetch(true);
+      const pos = await getPosition();
+      console.log(pos);
+      getWeather(pos.lat, pos.lon).then((res) => {
+        if (res) {
+          console.log(res);
+          setPckg(res);
+          if (!loc && res.loc) setCity(res.loc);
+          else setCity(Array.isArray(loc) ? loc[0] : loc || "");
+
+          function getBG(id: number | undefined) {
+            if (id === undefined) return "#131313";
+            if (id === 800) return "#FFED79";
+
+            if (
+              (id >= 801 && id <= 802) ||
+              (id >= 600 && id <= 622) ||
+              (id >= 701 && id <= 781)
+            )
+              return "#B7B4B4";
+
+            if (id >= 803 && id <= 804) return "#FFCA7B";
+
+            if (
+              (id >= 200 && id <= 232) ||
+              (id >= 300 && id <= 321) ||
+              (id >= 500 && id <= 531)
+            )
+              return "#708ADF";
+
+            return "#B7B4B4";
+          }
+
+          function getCL(color: string | undefined) {
+            if (color === "#FFED79" || color === "#FFCA7B") return "#131313";
+            return "#ffffff";
+          }
+          setBg(getBG(res?.weather_id));
+          setCl(getCL(bg));
+          fetchRes();
+          setIsFetch(false);
+        }
+      });
+    };
+    fetch();
+  }, [lon, lat, loc, bg]);
   return (
-    <SafeAreaView style={styles.Container}>
+    <SafeAreaView style={[styles.Container, { backgroundColor: bg }]}>
       <View style={styles.Header}>
         <MaterialCommunityIcons
+          color={cl}
           onPress={() => {
             route.push("/search");
           }}
@@ -63,51 +140,70 @@ const Index = () => {
           size={24}
         />
 
-        <View>
-          <Text>Cileungsi</Text>
-          <Text>14:43</Text>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 3,
+          }}
+        >
+          <Text style={[fontFamily.black, { fontSize: 16 }, { color: cl }]}>
+            {isFetch ? "" : city}
+          </Text>
+          <Text style={[fontFamily.regular, { color: cl }]}>
+            {!tm ? "" : tm?.getHours()}:{tm?.getMinutes()}
+          </Text>
         </View>
 
-        <MaterialCommunityIcons name="menu" size={24} />
+        <MaterialCommunityIcons color={cl} name="menu" size={24} />
       </View>
 
       <View style={styles.Main}>
-        <MaterialCommunityIcons name="weather-rainy" size={150} />
+        {WeatherIco(pckg?.weather_id ?? 0, cl)}
+        <View style={{ display: "flex", flexDirection: "row" }}>
+          <Text
+            style={[fontFamily.bold, styles.TextMain, { color: cl }]}
+            adjustsFontSizeToFit
+            numberOfLines={1}
+          >
+            {isFetch ? "--" : pckg?.temp}
+          </Text>
+          <Text
+            style={[fontFamily.regular, styles.TextIndicator, { color: cl }]}
+          >
+            °
+          </Text>
+        </View>
         <Text
-          style={[fontFamily.bold, styles.TextMain]}
-          adjustsFontSizeToFit
+          style={[fontFamily.semiBold, styles.TextUnderMain, { color: cl }]}
           numberOfLines={1}
         >
-          28°
+          {isFetch ? "" : pckg?.weather}
         </Text>
-        <Text
-          style={[fontFamily.semiBold, styles.TextUnderMain]}
-          adjustsFontSizeToFit
-          numberOfLines={1}
-        >
-          Rainy
-        </Text>
-        <Text style={{ fontSize: 14, textAlign: "center" }}>
-          Intensitas hujan yang mungkin terjadi diperkirakan ringan hingga
-          sedang.
+        <Text style={{ fontSize: 14, textAlign: "center", color: cl }}>
+          {!isFetch && !isRes ? "" : com}
         </Text>
       </View>
 
       <View style={styles.UnderMain}>
         <View style={styles.Card}>
-          <MaterialCommunityIcons size={24} name="cloud" />
-          <Text>45%</Text>
-          <Text>Clouds</Text>
+          <MaterialCommunityIcons size={24} color={cl} name="cloud" />
+          <Text style={{ color: cl }}>{isFetch ? "--" : pckg?.clouds}%</Text>
+          <Text style={{ color: cl }}>Clouds</Text>
         </View>
         <View style={styles.Card}>
-          <MaterialCommunityIcons size={24} name="water-percent" />
-          <Text>45%</Text>
-          <Text>Humidity</Text>
+          <MaterialCommunityIcons size={24} color={cl} name="water-percent" />
+          <Text style={{ color: cl }}>{isFetch ? "--" : pckg?.humidity}%</Text>
+          <Text style={{ color: cl }}>Humidity</Text>
         </View>
         <View style={styles.Card}>
-          <MaterialCommunityIcons size={24} name="weather-windy" />
-          <Text>45%</Text>
-          <Text>Wind</Text>
+          <MaterialCommunityIcons size={24} color={cl} name="weather-windy" />
+          <Text style={{ color: cl }}>
+            {isFetch ? "--" : pckg?.wind}
+            {wUnits}
+          </Text>
+          <Text style={{ color: cl }}>Wind</Text>
         </View>
       </View>
     </SafeAreaView>

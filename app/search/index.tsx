@@ -58,7 +58,7 @@ export default function Index() {
           onPress={() => {
             route.back();
           }}
-          name="cancel"
+          name="close"
           size={24}
         />
       </View>
@@ -73,7 +73,7 @@ export default function Index() {
                   onPress={() => {
                     route.push({
                       pathname: "/",
-                      params: { lon: item.lon, lat: item.lat },
+                      params: { lon: item.lon, lat: item.lat, loc: item.city },
                     });
                   }}
                   style={styleSearch.baseList}

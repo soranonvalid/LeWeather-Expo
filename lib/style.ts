@@ -63,7 +63,7 @@ export const Mainstyles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    gap: 10,
     borderRadius: 16,
     padding: 16,
   },
@@ -84,14 +84,15 @@ export const Mainstyles = StyleSheet.create({
   },
 
   TextMain: {
-    fontSize: 60,
-    maxWidth: "90%",
+    fontSize: 80,
     textAlign: "center",
+    position: "relative",
   },
 
+  TextIndicator: { fontSize: 50, position: "absolute", right: -20 },
+
   TextUnderMain: {
-    fontSize: 26,
-    maxWidth: "90%",
+    fontSize: 60,
     textAlign: "center",
   },
 });
