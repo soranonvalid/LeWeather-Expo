@@ -31,6 +31,7 @@ export const styleSearch = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 10,
     borderRadius: 40,
+    flex: 1,
   },
   baseList: {
     display: "flex",
@@ -54,7 +55,6 @@ export const Mainstyles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 8,
     marginBottom: 16,
-    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     paddingHorizontal: 12,
   },
@@ -63,8 +63,7 @@ export const Mainstyles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    backgroundColor: "yellow",
+    gap: 10,
     borderRadius: 16,
     padding: 16,
   },
@@ -73,7 +72,6 @@ export const Mainstyles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
     padding: 16,
     borderRadius: 16,
     marginTop: 16,
@@ -86,14 +84,15 @@ export const Mainstyles = StyleSheet.create({
   },
 
   TextMain: {
-    fontSize: 60,
-    maxWidth: "90%",
+    fontSize: 80,
     textAlign: "center",
+    position: "relative",
   },
 
+  TextIndicator: { fontSize: 50, position: "absolute", right: -20 },
+
   TextUnderMain: {
-    fontSize: 26,
-    maxWidth: "90%",
+    fontSize: 60,
     textAlign: "center",
   },
 });

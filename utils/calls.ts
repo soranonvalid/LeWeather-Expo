@@ -22,7 +22,8 @@ import { useFonts } from "@expo-google-fonts/roboto/useFonts";
 
 export interface weather {
   date: string;
-  weather: string;
+  weather: string | undefined;
+  weather_id: number;
   temp: number;
   humidity: number;
   wind: number;
@@ -38,7 +39,7 @@ export interface location {
   code: string;
 }
 
-export async function GetResponse(data: weather) {
+export async function GetResponse(data: weather, loc: string) {
   if (!data) return;
   console.log("start process");
   const key = process.env.EXPO_PUBLIC_AI;
@@ -48,14 +49,14 @@ export async function GetResponse(data: weather) {
       {
         role: "system",
         content:
-          "Reply in plain text only. No markdown. No newline. Keep answers under 45 words. Short sentences. No lists.",
+          "Reply in plain text only. No markdown. No newline. Keep answers under 30 words. Short sentences. No lists.",
       },
       {
         role: "user",
-        content: `As a professional weather forecaster with a sense of humor, analyze this current weather of ${data.weather} with temperature ${data.temp}°C, windspeed ${data.wind} m/s, humidity ${data.humidity} %, clouds ${data.clouds} % in ${data.loc}`,
+        content: `As a professional weather forecaster with a sense of humor, analyze this current weather of ${data.weather} with temperature ${data.temp}°C, windspeed ${data.wind} m/s, humidity ${data.humidity} %, clouds ${data.clouds} % in ${loc}`,
       },
     ],
-    max_tokens: 100,
+    max_tokens: 80,
     temperature: 0.3,
   };
 
@@ -70,26 +71,39 @@ export async function GetResponse(data: weather) {
         },
       }
     );
-    return res.data.choices[0].message.content;
+    return res?.data?.choices[0]?.message?.content;
   } catch (error) {
     console.error(error);
+    return "";
   }
 }
 
-export async function getWeather(lon: number = 0, lat: number = 0) {
+export async function getWeather(lat: number = 0, lon: number = 0) {
   const key = process.env.EXPO_PUBLIC_WEATHER;
   try {
     const res = await axios.get(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}.8&units=metric&appid=${key}`
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${key}`
     );
+    function groupWeather(id: number) {
+      if (id === 800) return "Clear";
+      if (id >= 801 && id <= 802) return "Cloudy";
+      if (id >= 803 && id <= 804) return "Overcast";
+      if (id >= 500 && id <= 531) return "Rainy";
+      if (id >= 200 && id <= 232) return "Thunderstorm";
+      if (id >= 300 && id <= 321) return "Drizzle";
+      if (id >= 600 && id <= 622) return "Snow";
+      if (id >= 701 && id <= 781) return "Fog";
+      return;
+    }
     return {
       date: Date(),
-      weather: res.data.weather[0].main,
+      weather: groupWeather(res.data.weather[0].id),
+      weather_id: res.data.weather[0].id,
       temp: res.data.main.temp,
       humidity: res.data.main.humidity,
       wind: res.data.wind.speed,
       clouds: res.data.clouds.all,
-      loc: res.data.sys.country || null,
+      loc: res.data.name || res.data.sys.country,
     };
   } catch (err) {
     console.error(err);
@@ -101,11 +115,16 @@ export async function getCities(q: string) {
   if (!q || q.trim() === "" || q.length < 3) return;
   try {
     const res = await axios.get(
-      `https://api.geoapify.com/v1/geocode/autocomplete?text=${q.toLowerCase()}&apiKey=${key}`
+      `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
+        q.toLowerCase()
+      )}&apiKey=${key}`
     );
     const list = res.data.features.map((feature: any, idx: number) => ({
       id: idx,
-      city: feature.properties.city || feature.properties.name,
+      city:
+        feature.properties.city ||
+        feature.properties.name ||
+        feature.properties.state,
       lon: feature.properties.lon,
       lat: feature.properties.lat,
       code: feature.properties.country_code.toUpperCase(),
