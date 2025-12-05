@@ -51,6 +51,7 @@ export function getWind(w: number) {
 }
 
 export async function GetResponse(data: weather, loc: string) {
+  const cons = false;
   if (!data) return;
   console.log("Responding...");
   const key = process.env.EXPO_PUBLIC_AI;
@@ -72,18 +73,22 @@ export async function GetResponse(data: weather, loc: string) {
   };
 
   try {
-    const res = await axios.post(
-      "https://openrouter.ai/api/v1/chat/completions",
-      body,
-      {
-        headers: {
-          Authorization: `Bearer ${key}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    console.log(res);
-    return res?.data?.choices[0]?.message?.content;
+    if (cons === true) {
+      const res = await axios.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(res);
+      return res?.data?.choices[0]?.message?.content;
+    } else {
+      return "chat ai goes here.";
+    }
   } catch (error) {
     console.error("res", error);
     return "";

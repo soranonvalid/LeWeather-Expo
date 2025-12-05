@@ -58,9 +58,12 @@ export default function Settings() {
           <Text style={styles.sectionTitle}>About App</Text>
         </View>
 
-        <Text style={styles.aboutText}>Leweather - Built with pawangers.</Text>
-        <Text style={styles.aboutText}>V.0.0.1</Text>
-        <Text style={styles.aboutText}>KODEIN STUDENTS. XI GRADE</Text>
+        <View style={{ paddingTop: 20 }}>
+          <Text style={styles.aboutText}>
+            Leweather - Built with pawangers.
+          </Text>
+          <Text style={styles.aboutText}>V.0.0.1</Text>
+        </View>
       </View>
       <TouchableOpacity
         onPress={() => {

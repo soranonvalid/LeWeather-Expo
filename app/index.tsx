@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const Index = () => {
   const route = useRouter();
-  const { lon, lat, loc } = useLocalSearchParams();
+  const { lon, lat, loc, status } = useLocalSearchParams();
   const { tunits, wunits } = useContext(SettingsContext);
 
   // str
@@ -21,21 +21,35 @@ const Index = () => {
   const [tm, setTm] = useState<Date | undefined>();
   const [pckg, setPckg] = useState<weather | null>(null);
 
-  // params
+  // flag
   const [isFetch, setIsFetch] = useState<boolean>(false);
   const [res, isRes] = useState<boolean>(false);
+  const [ready, setReady] = useState<boolean>(false);
 
   // tone
   const [bg, setBg] = useState<string>("#131313");
   const [cl, setCl] = useState<string>("#ffffff");
 
   useEffect(() => {
+    console.log("Page initializing");
     const timer = setInterval(() => {
       setTm(new Date());
     }, 1000);
 
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (
+      pckg &&
+      com &&
+      com.trim() !== "" &&
+      com !== undefined &&
+      tm &&
+      tm !== undefined
+    )
+      setReady(true);
+  }, [pckg, com, tm]);
 
   useEffect(() => {
     const getPosition = async () => {
@@ -65,19 +79,18 @@ const Index = () => {
       }
     };
 
-    const fetchRes = () => {
+    const fetchRes = (pckg: weather, cityN: string) => {
       isRes(true);
-      if (pckg)
-        GetResponse(pckg, city)
-          .then((res) => {
-            setCom(res);
-          })
-          .catch((err) => {
-            setCom("");
-          })
-          .finally(() => {
-            isRes(false);
-          });
+      GetResponse(pckg, cityN)
+        .then((res) => {
+          setCom(res);
+        })
+        .catch((err) => {
+          setCom("");
+        })
+        .finally(() => {
+          isRes(false);
+        });
     };
 
     const fetch = async () => {
@@ -118,15 +131,17 @@ const Index = () => {
             if (color === "#FFED79" || color === "#FFCA7B") return "#131313";
             return "#ffffff";
           }
-          setBg(getBG(res?.weather_id));
-          setCl(getCL(bg));
-          fetchRes();
+          const calcBG = getBG(res?.weather_id);
+          const calcCL = getCL(calcBG);
+          setBg(calcBG);
+          setCl(calcCL);
+          fetchRes(res, city);
           setIsFetch(false);
         }
       });
     };
     fetch();
-  }, [lon, lat, loc, bg]);
+  }, []);
 
   function convTemp(p: number, c: number = 1) {
     if (p === 0) return Number(c.toFixed(1));
@@ -149,41 +164,43 @@ const Index = () => {
 
   return (
     <SafeAreaView style={[styles.Container, { backgroundColor: bg }]}>
-      <View style={styles.Header}>
-        <MaterialCommunityIcons
-          color={cl}
-          onPress={() => {
-            route.push("/search");
-          }}
-          name="map-search"
-          size={24}
-        />
+      {ready && (
+        <View style={styles.Header}>
+          <MaterialCommunityIcons
+            color={cl}
+            onPress={() => {
+              route.push("/search");
+            }}
+            name="map-search"
+            size={24}
+          />
 
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 3,
-          }}
-        >
-          <Text style={[fontFamily.black, { fontSize: 16 }, { color: cl }]}>
-            {isFetch ? "" : city}
-          </Text>
-          <Text style={[fontFamily.regular, { color: cl }]}>
-            {!tm ? "" : tm?.getHours()}:{tm?.getMinutes()}
-          </Text>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 3,
+            }}
+          >
+            <Text style={[fontFamily.black, { fontSize: 16 }, { color: cl }]}>
+              {isFetch ? "" : city}
+            </Text>
+            <Text style={[fontFamily.regular, { color: cl }]}>
+              {!tm ? "" : tm?.getHours()}:{tm?.getMinutes()}
+            </Text>
+          </View>
+
+          <MaterialCommunityIcons
+            onPress={() => {
+              route.push("/settings");
+            }}
+            color={cl}
+            name="menu"
+            size={24}
+          />
         </View>
-
-        <MaterialCommunityIcons
-          onPress={() => {
-            route.push("/settings");
-          }}
-          color={cl}
-          name="menu"
-          size={24}
-        />
-      </View>
+      )}
 
       <View style={styles.Main}>
         {WeatherIco(pckg?.weather_id ?? 0, cl)}
@@ -208,30 +225,39 @@ const Index = () => {
           {isFetch ? "" : pckg?.weather}
         </Text>
         <Text style={{ fontSize: 14, textAlign: "center", color: cl }}>
-          {!isFetch && !res ? com : ""}
+          {!isFetch && !res && ready ? com : ""}
         </Text>
+        {!ready && (
+          <Text style={{ opacity: 0.5, color: cl }}>
+            {!status ? "Fetching weather..." : "fetching location..."}
+          </Text>
+        )}
       </View>
 
-      <View style={styles.UnderMain}>
-        <View style={styles.Card}>
-          <MaterialCommunityIcons size={24} color={cl} name="cloud" />
-          <Text style={{ color: cl }}>{isFetch ? "--" : pckg?.clouds}%</Text>
-          <Text style={{ color: cl }}>Clouds</Text>
+      {ready && (
+        <View style={styles.UnderMain}>
+          <View style={styles.Card}>
+            <MaterialCommunityIcons size={24} color={cl} name="cloud" />
+            <Text style={{ color: cl }}>{isFetch ? "--" : pckg?.clouds}%</Text>
+            <Text style={{ color: cl }}>Clouds</Text>
+          </View>
+          <View style={styles.Card}>
+            <MaterialCommunityIcons size={24} color={cl} name="water-percent" />
+            <Text style={{ color: cl }}>
+              {isFetch ? "--" : pckg?.humidity}%
+            </Text>
+            <Text style={{ color: cl }}>Humidity</Text>
+          </View>
+          <View style={styles.Card}>
+            <MaterialCommunityIcons size={24} color={cl} name="weather-windy" />
+            <Text style={{ color: cl }}>
+              {isFetch ? "--" : displayWind}
+              {getWind(wunits)}
+            </Text>
+            <Text style={{ color: cl }}>Wind</Text>
+          </View>
         </View>
-        <View style={styles.Card}>
-          <MaterialCommunityIcons size={24} color={cl} name="water-percent" />
-          <Text style={{ color: cl }}>{isFetch ? "--" : pckg?.humidity}%</Text>
-          <Text style={{ color: cl }}>Humidity</Text>
-        </View>
-        <View style={styles.Card}>
-          <MaterialCommunityIcons size={24} color={cl} name="weather-windy" />
-          <Text style={{ color: cl }}>
-            {isFetch ? "--" : displayWind}
-            {getWind(wunits)}
-          </Text>
-          <Text style={{ color: cl }}>Wind</Text>
-        </View>
-      </View>
+      )}
     </SafeAreaView>
   );
 };

@@ -1,4 +1,4 @@
-import { fontFamily, Settingstyles, styles, styleSearch } from "@/lib/style";
+import { fontFamily, styles, styleSearch } from "@/lib/style";
 import { getCities, location } from "@/utils/calls";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -59,22 +59,21 @@ export default function Index() {
             ref={inputRef}
           />
         </View>
-        <MaterialIcons
-          onPress={() => {
-            inputRef.current?.clear();
-          }}
-          name="close"
-          size={24}
-        />
-        <MaterialIcons
-          onPress={() => {
-            route.push("/");
-          }}
-          name="location-searching"
-          size={24}
-        />
+        {inp.trim() === "" ? (
+          ""
+        ) : (
+          <MaterialIcons
+            onPress={() => {
+              inputRef.current?.clear();
+              setList([]);
+              setInp("");
+            }}
+            name="close"
+            size={24}
+          />
+        )}
       </View>
-      <View style={{ paddingTop: 20 }}>
+      <View style={{ paddingTop: 20, display: isFetch ? "none" : "contents" }}>
         <FlatList
           data={list}
           keyExtractor={(item: location) => item.id.toString()}
@@ -86,7 +85,12 @@ export default function Index() {
                   onPress={() => {
                     route.push({
                       pathname: "/",
-                      params: { lon: item.lon, lat: item.lat, loc: item.city },
+                      params: {
+                        lon: item.lon,
+                        lat: item.lat,
+                        loc: item.city,
+                        status: "get",
+                      },
                     });
                   }}
                   style={styleSearch.baseList}
@@ -118,31 +122,77 @@ export default function Index() {
           }
         />
       </View>
-      <TouchableOpacity
-        disabled={isFetch}
-        onPress={() => {
-          if (inp.trim() === "") {
-            route.back();
-            return;
-          }
-          setIsFetch(true);
-          getCities(inp)
-            .then((res) => {
-              route.push({
-                pathname: "/",
-                params: { lon: res[0].lon, lat: res[0].lat, loc: res[0].city },
-              });
-            })
-            .finally(() => setIsFetch(false));
+      <View
+        style={{
+          position: "absolute",
+          bottom: 30,
+          right: 30,
+          display: "flex",
+          flexDirection: "row",
+          gap: 10,
         }}
-        style={Settingstyles.return}
       >
-        <MaterialCommunityIcons
-          name="keyboard-backspace"
-          size={30}
-          color="white"
-        />
-      </TouchableOpacity>
+        <TouchableOpacity
+          disabled={isFetch}
+          onPress={() => {
+            route.push({
+              pathname: "/",
+              params: {
+                status: "get",
+              },
+            });
+          }}
+          style={{
+            backgroundColor: "#69a2ff",
+            width: 60,
+            height: 60,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "100%",
+          }}
+        >
+          <MaterialIcons name="location-searching" color="white" size={24} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          disabled={isFetch}
+          onPress={() => {
+            if (inp.trim() === "") {
+              route.back();
+              return;
+            }
+            setIsFetch(true);
+            getCities(inp)
+              .then((res) => {
+                route.push({
+                  pathname: "/",
+                  params: {
+                    lon: res[0].lon,
+                    lat: res[0].lat,
+                    loc: res[0].city,
+                    status: "get",
+                  },
+                });
+              })
+              .finally(() => setIsFetch(false));
+          }}
+          style={{
+            backgroundColor: "black",
+            width: 60,
+            height: 60,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "100%",
+          }}
+        >
+          <MaterialCommunityIcons
+            name="keyboard-backspace"
+            size={30}
+            color="white"
+          />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
