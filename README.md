@@ -1,50 +1,54 @@
-# Welcome to your Expo app 👋
+# Weatherly
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+![Expo](https://img.shields.io/badge/Expo-54.0-blue)
+![React Native](https://img.shields.io/badge/React%20Native-Mobile-green)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-## Get started
+A mobile weather app built with Expo. It uses geocoding for location search, a weather API for forecasts, and OpenRouter for AI analysis. It includes a settings page for temperature and wind units.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Features
 
-2. Start the app
+- Search locations and view current weather and short forecast.
+- AI weather analysis powered by OpenRouter.
+- Settings for Celsius or Fahrenheit, and km/h or mph.
 
-   ```bash
-   npx expo start
-   ```
 
-In the output, you'll find options to open the app in a
+## Tech Stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Expo (React Native)
+- React Navigation
+- Axios / fetch
+- Geocoding API
+- Weather API
+- OpenRouter AI
+- AsyncStorage
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- ---
 
-## Get a fresh project
+- Environment Variables
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+Create a .env file in the project root:
+``` env
+EXPO_PUBLIC_AI=
+EXPO_PUBLIC_WEATHER=
+OPENROUTER_GEO=
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-## Learn more
+## Basic Flow
 
-To learn more about developing your project with Expo, look at the following resources:
+User searches a place.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+App fetches coordinates with geocoding.
 
-## Join the community
+App requests weather data.
 
-Join our community of developers creating universal apps.
+Optional AI summary call to OpenRouter.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+License
+
+MIT License. Feel free to reuse the code and adapt it to your needs.
